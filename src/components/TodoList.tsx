@@ -1,3 +1,5 @@
+import { useReducer, useState } from "react";
+
 type Todo = {
   id: number;
   text: string;
@@ -35,3 +37,48 @@ const emojiMap: { [key: string]: string } = {
   code: "💻",
   exercise: "🏋️",
 };
+
+const TodoList: React.FC = () => {
+  const [state, dispatch] = useReducer(todoReducer, initialState);
+  const [todoText, setTodoText] = useState("");
+
+  const handleAddTodo = () => {
+    const mappedText = emojiMap[todoText.toLocaleLowerCase()] || todoText;
+    if (mappedText.trim()) {
+      dispatch({ type: "ADD_TODO", payload: mappedText });
+      setTodoText("");
+    }
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleAddTodo();
+    }
+  };
+
+  return (
+    <div>
+      <em>Made with useReducer</em>
+      <h1>Emoji Todo list</h1>
+      <input
+        type="text"
+        value={todoText}
+        onChange={(e) => setTodoText(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder="Add a new todo"
+      />
+      <ul>
+        {state.todos.map((todo) => (
+          <li
+            key={todo.id}
+            onClick={() => dispatch({ type: "REMOVE_TODO", payload: todo.id })}
+          >
+            {todo.text}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export { TodoList };
